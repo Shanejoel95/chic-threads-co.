@@ -112,3 +112,38 @@ export const useDeleteProduct = () => {
     },
   });
 };
+
+export const useToggleProductVisibility = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, is_visible }: { id: string; is_visible: boolean }) => {
+      const { data, error } = await supabase
+        .from('products')
+        .update({ is_visible })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({
+        title: variables.is_visible ? 'Product visible' : 'Product hidden',
+        description: variables.is_visible 
+          ? 'The product is now visible to customers.' 
+          : 'The product is now hidden from customers.',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error updating visibility',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+};
