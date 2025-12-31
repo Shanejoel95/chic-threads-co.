@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import { useCategories } from '@/hooks/use-products';
 import { useImageUpload } from '@/hooks/use-image-upload';
 import { Loader2, Plus, X, Upload, ImageIcon, Trash2 } from 'lucide-react';
@@ -447,18 +446,6 @@ const ProductForm = ({ initialData, onSubmit, isLoading, submitLabel = 'Save Pro
 
       {/* Product Options */}
       <div className="space-y-4 pt-2 border-t border-border">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="is_visible">Visible on Site</Label>
-            <p className="text-xs text-muted-foreground">Show this product to customers</p>
-          </div>
-          <Switch
-            id="is_visible"
-            checked={formData.is_visible}
-            onCheckedChange={(checked) => setFormData({ ...formData, is_visible: checked })}
-          />
-        </div>
-        
         <div className="flex items-center gap-6">
           <div className="flex items-center space-x-2">
             <Checkbox
