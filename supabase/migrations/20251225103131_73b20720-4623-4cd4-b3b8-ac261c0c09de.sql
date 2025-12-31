@@ -1,0 +1,17 @@
+-- Insert categories
+INSERT INTO public.categories (name, slug, description, image) VALUES
+  ('Women', 'women', 'Elegant pieces for the modern woman', NULL),
+  ('Men', 'men', 'Refined essentials for the discerning gentleman', NULL),
+  ('Kids', 'kids', 'Playful yet sophisticated styles for children', NULL),
+  ('Accessories', 'accessories', 'The finishing touches that elevate every look', NULL);
+
+-- Insert products with category references
+INSERT INTO public.products (name, description, price, sale_price, category_id, sizes, colors, images, stock, featured, is_new) VALUES
+  ('Cashmere Wool Coat', 'Luxuriously soft cashmere wool coat with a timeless silhouette. Perfect for elegant occasions and everyday sophistication.', 495, NULL, (SELECT id FROM public.categories WHERE slug = 'women'), ARRAY['XS', 'S', 'M', 'L', 'XL'], ARRAY['{"name": "Cream", "hex": "#F5F5DC"}', '{"name": "Camel", "hex": "#C19A6B"}'], ARRAY['/placeholder.svg'], 15, true, true),
+  ('Designer Blazer', 'Sharp tailored blazer crafted from premium Italian wool. A wardrobe essential for the modern professional.', 385, 299, (SELECT id FROM public.categories WHERE slug = 'women'), ARRAY['XS', 'S', 'M', 'L', 'XL'], ARRAY['{"name": "Black", "hex": "#1a1a1a"}', '{"name": "Navy", "hex": "#1a2a4a"}'], ARRAY['/placeholder.svg'], 22, true, false),
+  ('Silk Blouse', 'Elegant silk blouse with a relaxed fit and refined details. Versatile enough for the office or evening wear.', 195, NULL, (SELECT id FROM public.categories WHERE slug = 'women'), ARRAY['XS', 'S', 'M', 'L'], ARRAY['{"name": "Champagne", "hex": "#F7E7CE"}', '{"name": "Ivory", "hex": "#FFFFF0"}'], ARRAY['/placeholder.svg'], 30, false, true),
+  ('Tailored Trousers', 'Impeccably tailored trousers in fine wool blend. The perfect foundation for any refined ensemble.', 225, NULL, (SELECT id FROM public.categories WHERE slug = 'men'), ARRAY['S', 'M', 'L', 'XL', 'XXL'], ARRAY['{"name": "Navy", "hex": "#1a2a4a"}', '{"name": "Charcoal", "hex": "#36454F"}'], ARRAY['/placeholder.svg'], 18, true, false),
+  ('Merino Turtleneck', 'Ultra-soft merino wool turtleneck sweater. Warmth and elegance combined in a timeless design.', 175, NULL, (SELECT id FROM public.categories WHERE slug = 'men'), ARRAY['S', 'M', 'L', 'XL'], ARRAY['{"name": "Camel", "hex": "#C19A6B"}', '{"name": "Burgundy", "hex": "#722F37"}'], ARRAY['/placeholder.svg'], 25, false, true),
+  ('Cashmere Scarf', 'Sumptuous cashmere scarf with delicate fringe detailing. An accessory that elevates any look.', 145, NULL, (SELECT id FROM public.categories WHERE slug = 'accessories'), ARRAY['One Size'], ARRAY['{"name": "Grey", "hex": "#808080"}', '{"name": "Camel", "hex": "#C19A6B"}'], ARRAY['/placeholder.svg'], 40, true, false),
+  ('Essential Cotton Tee', 'Premium organic cotton t-shirt with a relaxed fit. The foundation of effortless style.', 65, NULL, (SELECT id FROM public.categories WHERE slug = 'men'), ARRAY['XS', 'S', 'M', 'L', 'XL', 'XXL'], ARRAY['{"name": "White", "hex": "#FFFFFF"}', '{"name": "Black", "hex": "#1a1a1a"}'], ARRAY['/placeholder.svg'], 50, false, false),
+  ('Flowing Maxi Dress', 'Ethereal maxi dress in flowing chiffon. A statement piece for special occasions and memorable moments.', 345, 275, (SELECT id FROM public.categories WHERE slug = 'women'), ARRAY['XS', 'S', 'M', 'L'], ARRAY['{"name": "Dusty Rose", "hex": "#D4A5A5"}', '{"name": "Sage", "hex": "#9CAF88"}'], ARRAY['/placeholder.svg'], 12, true, true);
