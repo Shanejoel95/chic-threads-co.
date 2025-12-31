@@ -14,9 +14,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProducts } from '@/hooks/use-products';
 import { useAdminOrders } from '@/hooks/use-orders';
 import { useCustomerCount, useMonthlyStats, useTopSellingProducts } from '@/hooks/use-admin-stats';
+import { useRealtimeOrders } from '@/hooks/use-realtime-orders';
 import RevenueChart from '@/components/admin/RevenueChart';
 
 const AdminDashboard = () => {
+  // Subscribe to real-time order updates
+  useRealtimeOrders();
+
   const { data: products = [], isLoading: productsLoading } = useProducts(true);
   const { data: orders = [], isLoading: ordersLoading } = useAdminOrders();
   const { data: customerCount = 0, isLoading: customersLoading } = useCustomerCount();
