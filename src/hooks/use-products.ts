@@ -59,6 +59,7 @@ const transformProduct = (dbProduct: DbProduct): Product => ({
   sku: `SKU-${dbProduct.id.slice(0, 8).toUpperCase()}`,
   featured: dbProduct.featured,
   isNew: dbProduct.is_new,
+  isVisible: dbProduct.is_visible,
 });
 
 // Transform database category to app Category type
