@@ -1,3 +1,4 @@
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,43 +28,45 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <CartProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              {/* Customer Routes */}
-              <Route path="/" element={<Layout><Index /></Layout>} />
-              <Route path="/shop" element={<Layout><Shop /></Layout>} />
-              <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
-              <Route path="/auth" element={<Layout><Auth /></Layout>} />
-              <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
-              <Route path="/order-confirmation" element={<Layout><OrderConfirmation /></Layout>} />
-              <Route path="/orders" element={<Layout><MyOrders /></Layout>} />
-              <Route path="/account" element={<Layout><Account /></Layout>} />
-              <Route path="/wishlist" element={<Layout><Wishlist /></Layout>} />
-              <Route path="/admin-setup" element={<Layout><AdminSetup /></Layout>} />
-              {/* Admin Routes */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="products" element={<AdminProducts />} />
-                <Route path="orders" element={<AdminOrders />} />
-                <Route path="categories" element={<AdminCategories />} />
-                <Route path="customers" element={<AdminCustomers />} />
-                <Route path="settings" element={<AdminSettings />} />
-              </Route>
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </CartProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                {/* Customer Routes */}
+                <Route path="/" element={<Layout><Index /></Layout>} />
+                <Route path="/shop" element={<Layout><Shop /></Layout>} />
+                <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
+                <Route path="/auth" element={<Layout><Auth /></Layout>} />
+                <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
+                <Route path="/order-confirmation" element={<Layout><OrderConfirmation /></Layout>} />
+                <Route path="/orders" element={<Layout><MyOrders /></Layout>} />
+                <Route path="/account" element={<Layout><Account /></Layout>} />
+                <Route path="/wishlist" element={<Layout><Wishlist /></Layout>} />
+                <Route path="/admin-setup" element={<Layout><AdminSetup /></Layout>} />
+                {/* Admin Routes */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="products" element={<AdminProducts />} />
+                  <Route path="orders" element={<AdminOrders />} />
+                  <Route path="categories" element={<AdminCategories />} />
+                  <Route path="customers" element={<AdminCustomers />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                </Route>
+                
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </CartProvider>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
