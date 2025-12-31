@@ -98,11 +98,11 @@ export const useProducts = (includeHidden = false) => {
   });
 };
 
-export const useProduct = (id: string) => {
+export const useProduct = (id: string, includeHidden = false) => {
   return useQuery({
-    queryKey: ['product', id],
+    queryKey: ['product', id, { includeHidden }],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('products')
         .select(`
           *,
@@ -112,8 +112,13 @@ export const useProduct = (id: string) => {
             slug
           )
         `)
-        .eq('id', id)
-        .maybeSingle();
+        .eq('id', id);
+      
+      if (!includeHidden) {
+        query = query.eq('is_visible', true);
+      }
+      
+      const { data, error } = await query.maybeSingle();
 
       if (error) throw error;
       if (!data) return null;
@@ -138,6 +143,7 @@ export const useFeaturedProducts = () => {
           )
         `)
         .eq('featured', true)
+        .eq('is_visible', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -161,6 +167,7 @@ export const useNewArrivals = () => {
           )
         `)
         .eq('is_new', true)
+        .eq('is_visible', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
