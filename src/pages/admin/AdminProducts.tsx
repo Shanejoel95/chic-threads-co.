@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, Loader2 } from 'lucide-react';
+import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -35,7 +36,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useProducts, useCategories } from '@/hooks/use-products';
-import { useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/use-product-mutations';
+import { useCreateProduct, useUpdateProduct, useDeleteProduct, useToggleProductVisibility } from '@/hooks/use-product-mutations';
 import ProductForm from '@/components/admin/ProductForm';
 import type { Product } from '@/types/product';
 import { Link } from 'react-router-dom';
@@ -46,6 +47,7 @@ const AdminProducts = () => {
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
+  const toggleVisibility = useToggleProductVisibility();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -142,6 +144,7 @@ const AdminProducts = () => {
               <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Stock</TableHead>
+              <TableHead>Visible</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="w-16"></TableHead>
             </TableRow>
@@ -149,13 +152,13 @@ const AdminProducts = () => {
           <TableBody>
             {filteredProducts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   No products found
                 </TableCell>
               </TableRow>
             ) : (
               filteredProducts.map((product) => (
-                <TableRow key={product.id}>
+                <TableRow key={product.id} className={!product.isVisible ? 'opacity-60' : ''}>
                   <TableCell>
                     <div className="w-12 h-12 rounded bg-muted overflow-hidden">
                       <img
@@ -207,6 +210,22 @@ const AdminProducts = () => {
                     >
                       {product.stock}
                     </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={product.isVisible ?? true}
+                        onCheckedChange={(checked) =>
+                          toggleVisibility.mutate({ id: product.id, is_visible: checked })
+                        }
+                        disabled={toggleVisibility.isPending}
+                      />
+                      {product.isVisible ? (
+                        <Eye className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant={product.stock > 0 ? 'default' : 'destructive'}>
