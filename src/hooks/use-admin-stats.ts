@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 
 export const useCustomerCount = () => {
   return useQuery({
@@ -64,6 +65,52 @@ export const useMonthlyStats = () => {
         revenueChange: Number(revenueChange),
         orderChange: Number(orderChange),
       };
+    },
+  });
+};
+
+export const useRevenueChart = (days: number = 7) => {
+  return useQuery({
+    queryKey: ['revenue-chart', days],
+    queryFn: async () => {
+      const endDate = new Date();
+      const startDate = subDays(endDate, days - 1);
+
+      const { data: orders, error } = await supabase
+        .from('orders')
+        .select('total, created_at')
+        .gte('created_at', startOfDay(startDate).toISOString())
+        .lte('created_at', endOfDay(endDate).toISOString())
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      // Create a map of dates with their totals
+      const dailyRevenue: Record<string, { revenue: number; orders: number }> = {};
+      
+      // Initialize all days with zero
+      for (let i = 0; i < days; i++) {
+        const date = subDays(endDate, days - 1 - i);
+        const dateKey = format(date, 'yyyy-MM-dd');
+        dailyRevenue[dateKey] = { revenue: 0, orders: 0 };
+      }
+
+      // Aggregate orders by date
+      orders?.forEach((order) => {
+        const dateKey = format(new Date(order.created_at), 'yyyy-MM-dd');
+        if (dailyRevenue[dateKey]) {
+          dailyRevenue[dateKey].revenue += Number(order.total);
+          dailyRevenue[dateKey].orders += 1;
+        }
+      });
+
+      // Convert to array for chart
+      return Object.entries(dailyRevenue).map(([date, data]) => ({
+        date,
+        displayDate: format(new Date(date), 'MMM dd'),
+        revenue: data.revenue,
+        orders: data.orders,
+      }));
     },
   });
 };
