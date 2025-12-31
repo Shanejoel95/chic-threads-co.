@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProducts } from '@/hooks/use-products';
 import { useAdminOrders } from '@/hooks/use-orders';
 import { useCustomerCount, useMonthlyStats, useTopSellingProducts } from '@/hooks/use-admin-stats';
+import RevenueChart from '@/components/admin/RevenueChart';
 
 const AdminDashboard = () => {
   const { data: products = [], isLoading: productsLoading } = useProducts(true);
@@ -124,6 +125,9 @@ const AdminDashboard = () => {
           );
         })}
       </div>
+
+      {/* Revenue Chart */}
+      <RevenueChart />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent Orders */}
