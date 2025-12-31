@@ -12,6 +12,7 @@ export interface Product {
   sku: string;
   featured: boolean;
   isNew: boolean;
+  isVisible?: boolean;
 }
 
 export interface CartItem {

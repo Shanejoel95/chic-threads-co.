@@ -7,6 +7,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Loader2,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProducts } from '@/hooks/use-products';
@@ -171,12 +173,19 @@ const AdminDashboard = () => {
               {lowStockProducts.length > 0 ? (
                 lowStockProducts.slice(0, 5).map((product) => (
                   <div key={product.id} className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded bg-muted overflow-hidden">
+                    <div className="relative w-12 h-12 rounded bg-muted overflow-hidden">
                       <img
                         src={product.images[0]}
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
+                      <div className={`absolute top-0.5 right-0.5 p-0.5 rounded-full ${product.isVisible ? 'bg-green-500' : 'bg-muted-foreground'}`}>
+                        {product.isVisible ? (
+                          <Eye className="h-2.5 w-2.5 text-white" />
+                        ) : (
+                          <EyeOff className="h-2.5 w-2.5 text-white" />
+                        )}
+                      </div>
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-sm">{product.name}</p>
@@ -213,7 +222,7 @@ const AdminDashboard = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {topProducts.map((product, index) => (
                 <div key={product.product_id || index} className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded bg-muted overflow-hidden">
+                  <div className="relative w-16 h-16 rounded bg-muted overflow-hidden">
                     {product.product_image ? (
                       <img
                         src={product.product_image}
@@ -225,6 +234,13 @@ const AdminDashboard = () => {
                         <Package className="h-6 w-6 text-muted-foreground" />
                       </div>
                     )}
+                    <div className={`absolute top-0.5 right-0.5 p-0.5 rounded-full ${product.isVisible ? 'bg-green-500' : 'bg-muted-foreground'}`}>
+                      {product.isVisible ? (
+                        <Eye className="h-2.5 w-2.5 text-white" />
+                      ) : (
+                        <EyeOff className="h-2.5 w-2.5 text-white" />
+                      )}
+                    </div>
                   </div>
                   <div>
                     <p className="font-medium text-sm line-clamp-1">{product.product_name}</p>

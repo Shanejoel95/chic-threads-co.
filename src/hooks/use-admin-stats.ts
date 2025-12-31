@@ -120,11 +120,21 @@ export const useTopSellingProducts = () => {
     queryKey: ['top-selling-products'],
     queryFn: async () => {
       // Get order items with counts
-      const { data, error } = await supabase
+      const { data: orderItems, error: orderError } = await supabase
         .from('order_items')
         .select('product_id, product_name, product_image, quantity');
 
-      if (error) throw error;
+      if (orderError) throw orderError;
+
+      // Get all products for visibility info
+      const { data: products, error: productsError } = await supabase
+        .from('products')
+        .select('id, is_visible');
+
+      if (productsError) throw productsError;
+
+      // Create a map for product visibility
+      const visibilityMap = new Map(products?.map((p) => [p.id, p.is_visible]) || []);
 
       // Aggregate by product
       const productSales: Record<string, { 
@@ -132,10 +142,10 @@ export const useTopSellingProducts = () => {
         product_name: string; 
         product_image: string | null;
         totalQuantity: number;
-        totalRevenue: number;
+        isVisible: boolean;
       }> = {};
 
-      data?.forEach((item) => {
+      orderItems?.forEach((item) => {
         const key = item.product_id || item.product_name;
         if (!productSales[key]) {
           productSales[key] = {
@@ -143,7 +153,7 @@ export const useTopSellingProducts = () => {
             product_name: item.product_name,
             product_image: item.product_image,
             totalQuantity: 0,
-            totalRevenue: 0,
+            isVisible: item.product_id ? (visibilityMap.get(item.product_id) ?? true) : true,
           };
         }
         productSales[key].totalQuantity += item.quantity;
