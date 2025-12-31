@@ -6,52 +6,86 @@ import {
   TrendingUp,
   ArrowUpRight,
   ArrowDownRight,
+  Loader2,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { products } from '@/data/products';
+import { useProducts } from '@/hooks/use-products';
+import { useAdminOrders } from '@/hooks/use-orders';
+import { useCustomerCount, useMonthlyStats, useTopSellingProducts } from '@/hooks/use-admin-stats';
 
 const AdminDashboard = () => {
-  // Mock data for dashboard
+  const { data: products = [], isLoading: productsLoading } = useProducts(true);
+  const { data: orders = [], isLoading: ordersLoading } = useAdminOrders();
+  const { data: customerCount = 0, isLoading: customersLoading } = useCustomerCount();
+  const { data: monthlyStats, isLoading: statsLoading } = useMonthlyStats();
+  const { data: topProducts = [], isLoading: topProductsLoading } = useTopSellingProducts();
+
+  const isLoading = productsLoading || ordersLoading || customersLoading || statsLoading;
+
+  // Calculate total revenue from all orders
+  const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total), 0);
+
+  // Low stock products (less than 20)
+  const lowStockProducts = products.filter((p) => p.stock < 20);
+
+  // Recent orders (last 5)
+  const recentOrders = orders.slice(0, 5);
+
+  // Stats for display
   const stats = [
     {
       title: 'Total Revenue',
-      value: '$45,231.89',
-      change: '+20.1%',
-      trend: 'up',
+      value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      change: monthlyStats ? `${monthlyStats.revenueChange >= 0 ? '+' : ''}${monthlyStats.revenueChange}%` : '+0%',
+      trend: monthlyStats && monthlyStats.revenueChange >= 0 ? 'up' : 'down',
       icon: DollarSign,
     },
     {
       title: 'Orders',
-      value: '356',
-      change: '+12.5%',
-      trend: 'up',
+      value: orders.length.toString(),
+      change: monthlyStats ? `${monthlyStats.orderChange >= 0 ? '+' : ''}${monthlyStats.orderChange}%` : '+0%',
+      trend: monthlyStats && monthlyStats.orderChange >= 0 ? 'up' : 'down',
       icon: ShoppingCart,
     },
     {
       title: 'Products',
       value: products.length.toString(),
-      change: '+3',
+      change: `${products.length}`,
       trend: 'up',
       icon: Package,
     },
     {
       title: 'Customers',
-      value: '2,350',
-      change: '+180',
+      value: customerCount.toString(),
+      change: `${customerCount}`,
       trend: 'up',
       icon: Users,
     },
   ];
 
-  const recentOrders = [
-    { id: 'LX00001', customer: 'John Smith', amount: 299.99, status: 'Delivered' },
-    { id: 'LX00002', customer: 'Sarah Johnson', amount: 495.00, status: 'Processing' },
-    { id: 'LX00003', customer: 'Mike Davis', amount: 175.00, status: 'Shipped' },
-    { id: 'LX00004', customer: 'Emily Brown', amount: 385.00, status: 'Pending' },
-    { id: 'LX00005', customer: 'Chris Wilson', amount: 145.00, status: 'Delivered' },
-  ];
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'delivered':
+        return 'bg-green-100 text-green-700';
+      case 'shipped':
+        return 'bg-blue-100 text-blue-700';
+      case 'processing':
+      case 'confirmed':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'cancelled':
+        return 'bg-red-100 text-red-700';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
+  };
 
-  const lowStockProducts = products.filter((p) => p.stock < 20);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -99,30 +133,26 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-sm">{order.customer}</p>
-                    <p className="text-xs text-muted-foreground">{order.id}</p>
+              {recentOrders.length > 0 ? (
+                recentOrders.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-sm">{order.shipping_name}</p>
+                      <p className="text-xs text-muted-foreground">{order.id.slice(0, 8).toUpperCase()}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-sm">${Number(order.total).toFixed(2)}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${getStatusColor(order.status)}`}>
+                        {order.status}
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium text-sm">${order.amount.toFixed(2)}</p>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${
-                        order.status === 'Delivered'
-                          ? 'bg-green-100 text-green-700'
-                          : order.status === 'Shipped'
-                          ? 'bg-blue-100 text-blue-700'
-                          : order.status === 'Processing'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-muted text-muted-foreground'
-                      }`}
-                    >
-                      {order.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No orders yet
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -135,7 +165,7 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="space-y-4">
               {lowStockProducts.length > 0 ? (
-                lowStockProducts.map((product) => (
+                lowStockProducts.slice(0, 5).map((product) => (
                   <div key={product.id} className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded bg-muted overflow-hidden">
                       <img
@@ -171,29 +201,45 @@ const AdminDashboard = () => {
           <CardTitle>Top Selling Products</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {products.filter((p) => p.featured).slice(0, 4).map((product) => (
-              <div key={product.id} className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded bg-muted overflow-hidden">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="font-medium text-sm">{product.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    ${(product.salePrice ?? product.price).toFixed(2)}
-                  </p>
-                  <div className="flex items-center gap-1 text-xs text-green-600 mt-1">
-                    <TrendingUp className="h-3 w-3" />
-                    <span>+{Math.floor(Math.random() * 30) + 10}%</span>
+          {topProductsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : topProducts.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {topProducts.map((product, index) => (
+                <div key={product.product_id || index} className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded bg-muted overflow-hidden">
+                    {product.product_image ? (
+                      <img
+                        src={product.product_image}
+                        alt={product.product_name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Package className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm line-clamp-1">{product.product_name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {product.totalQuantity} sold
+                    </p>
+                    <div className="flex items-center gap-1 text-xs text-green-600 mt-1">
+                      <TrendingUp className="h-3 w-3" />
+                      <span>Top seller</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              No sales data yet
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
