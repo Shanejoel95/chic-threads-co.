@@ -37,11 +37,15 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useProducts, useCategories } from '@/hooks/use-products';
 import { useCreateProduct, useUpdateProduct, useDeleteProduct, useToggleProductVisibility } from '@/hooks/use-product-mutations';
+import { useRealtimeProducts } from '@/hooks/use-realtime-products';
 import ProductForm from '@/components/admin/ProductForm';
 import type { Product } from '@/types/product';
 import { Link } from 'react-router-dom';
 
 const AdminProducts = () => {
+  // Subscribe to real-time product updates
+  useRealtimeProducts();
+
   const { data: products, isLoading } = useProducts(true); // Include hidden products
   const { data: categories } = useCategories();
   const createProduct = useCreateProduct();
