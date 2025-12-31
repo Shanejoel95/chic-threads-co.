@@ -26,10 +26,14 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useAdminOrders, useUpdateOrderStatus, Order } from '@/hooks/use-orders';
+import { useRealtimeOrders } from '@/hooks/use-realtime-orders';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const AdminOrders = () => {
+  // Subscribe to real-time order updates
+  useRealtimeOrders();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
